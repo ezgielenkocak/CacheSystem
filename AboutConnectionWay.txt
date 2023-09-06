@@ -1,0 +1,18 @@
+*redisi pcde ayaða kaldýrmak için;
+	 docker run --name redis -p 1453:6379 -d redis
+
+*ayaða kalkmýþ containerlarý görmek için kontrol etmek için;
+	docker ps
+
+*Redis insight üzerinden redis serverýnýn çalýþýp çalýþmadýðýna bakmak için;
+*Redis containerýnýn içine girip redis cli üzerinden ping atmak;
+	docker exec -it d5b redis-cli
+
+*Redis insigt=>new database
+
+*Bizim redis sunucumuz; dockerize edilmiþ þekilde bir container içinde
+*Redis insightta database oluþtururken Port'a 1453 yazýcaz çünkü baþta öyle ayarladýk
+
+*Powershelde komutlarla redis databaseine veri eklemek için;
+	docker exec -it d5b redis-cli --raw (dockerize ettiðimiz için, docker containerýndaki redis sunucusuna, redis cli üzerinden baðlanmamýz gerekiyor)
+

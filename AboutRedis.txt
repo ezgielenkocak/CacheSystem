@@ -1,0 +1,192 @@
+---------------------------------------------------REDIS--------------------------------------------------------------------------
+
+-CACHÝNG NEDÝR?
++ Verilere daha hýzlý eriþebilmek için bu verilerin bellekte saklanmasýdýr. (Veriyi veritabanýnda ziyade önbelleðe almaktýr)
++ Sabit diske nazaran RAM anlýk olarak iþlem yapýlabilecek verilerin tutulduðu ordam old. için verilere daha hýzlý ulaþým olur.
++ Belirli verisel iþlemler sürecinde hýz kazandýracak ve performans açýsýndan optimizasyon saðlayacak.
++ ZAMANSAL FARK YARATIR.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 
+-CACHÝNG'ÝN YAZILIM SÜREÇLERÝNE FAYDALARI
+ +Veri eriþimini hýzlandýrýr.
+ +Performans artýþý.
+ +Sunucu yükünü azaltýr.
+ +Çevrimiçi Uygulamalar için Kritiktir.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-Ne Tarz Veriler Cache'lenir?
+ +Sýklýkla ve hýzlý þekilde eriþilecek veriler olmalýdýr. (Örn: yapýlandýrma bilgileri, menü bilgileri, yetkiler)
+ +Resim ve video dosyalarý gibi static yapýlanmalarda cache'lenir.
+
+NOT: *Sürekli güncellenen veriler,
+     *Kiþisel olan veriler,
+     *Geçici veriler,
+     *Güvenlik açýsýndan risk teþkil eden verilerde CACH'LENMEMELÝDÝR.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-CACHÝNG'ÝN YAZILIM AÇISINDAN ZARARLI YANLARI
+ +Bellek yükü artar.
+ +Güncellik sorunu.
+ +Güvenlik sorunlarý.
+ +Yasa dýþý kullaným (saðlýk, finans, kimlik) cachlenmesi hukuki problem yaratabilir.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-CACHE MEKANÝZMASININ TEMEL BÝLEÞENLERÝ
+ 1-) cache belleði  (verilerin saklandýðý bellek. Verilere hýzlý þekilde eriþilebilir hale getirmek için kullanýlýr.)
+ 2-) cache bellek yönetimi  (bellekte saklanan verileri yönetmek için kullanýrýz. Örn: verilerin saklanma süresi, silinme sýklýðý, güncellik durumu gibi yapýlandýrmalar)
+ 3-) cache algoritmasý (verilerin cache belleðine nasýl eklenip silineceðini belirleyen algoritma)
+
+
+NOT: Verilerin cachlenme süresi verinin yapýlarýna, deðiþim sürecine göre deðiþiklik gösterir.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-CACHÝNG KULLANMADAN TÜM VERÝLERÝ VERÝTABANINDAN OKURSAK; Uygulama performans açýsýndan daha yavaþ çalýþacaktýr.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-CACHÝNG YAKLAÞIMLARI;
+ -1-) In-Memory Caching => Verileri uygulamanýn çalýþtýðý bilgisayarýn Ram'inde cachleyen yaklaþým.
+
+ -2-) Distributed Caching => Verileri birden fazla makinede cache'leyen böylece verileri farklý noktalarda tutarak tek bir noktada saklayan daha güvenli bir yaklaþým
+                          => Veriler bölünerek farklý makinelere daðýtýlýr. Haliyle büyük veri setleri için daha uygun bir yaklaþýmdýr.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+-CACHLEME YAPARKEN KULLANILABÝLECEK YAPILAR
+ +REDIS(Remote Dictionary Server)
+ 	Open source olan ve bellekte veri yapýlarýný yüksek performsla cache'lemek için kullanýlan bir veritabanýdýr.
+ 	Caching iþlemlerinin yaný sýra message broker olarak da kullanýlabilir.
+ 	Yapýsal olarak key-value veri modelinde çalýþýr
+ 	NoSQL veritabanýdýr.
+
+ +MEMCACHED
+ 
+ +HAZELCAST (java tabanlý)
+
+ +APACHE IGNITE
+ 
+ +EHCACHE (java tabanlý)
+
+
+
+
+------------------------------------------------------------------------------------------------
+VERÝLERÝ NEDEN RAMDA TUTMAYA ÝHTÝYAÇ DUYARIZ?
+Sql yapýlarý cpu kullanarak iþlem yaptýðý için big datalarla çalýþtýðýmýzda cpu'ya yük bindiririz, redis gibi yapýlar da bu yükü azaltmaya yardýmcý olur ve hýz konusunda performans artýþý saðlar.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Docker image: çalýþacak uygulamanýn  paket haline gelmiþ þekli ve uygulama altyapýsýnda çalýþan gerekli iþletim sistemi kütüphanelerinin bulunduðu yapý.
+       imajlarý, container yaratmak için gereken talimatlarýn bulunduðu þablon gibi düþün
+       container: paket haline getirilen image’lerin çalýþtýrýlacaðý alandýr
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+CMD: (pcnde dockeryüklüyse komutlar çalýþacaktýr)
+
+-------------------------------------------------REDIS SUNUCUSUNU DOCKERIZE ETMEK:-----------------------------------------------------------------------
+redis instance'ýný baþlatmak için=> 
+     docker run --name -redis -p 1453:6379  -d redis 
+
+(redis image'ine karþýlýk container talebinde bulunduk ve localhost üzerinden 1453 yazýnca bizi 6379 portuna göndericek) (redis sunucusunu dockerize etmiþ oldum)
+
+redisin container içindeki portu=>6379 olacak redisin kendi default portu.
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+
+
+
+------------------------------------REDIS SUNUCUSUNU DOCEKRIZE ETTÝÐÝMÝ KONTROL ETMEK ÝÇÝN-----------------------------------------------------------------------
+
+docker ps
+bu bize o anda ayakta olan tüm containerlarý getirir. (Redis image'inden bi container ayaða kalktýðýný görmüþ olduk)
+
+
+
+------------------------------------------BAÞKA BÝR TEYÝT  ETME YÖNTEMÝ-------------------------------------------------------------------------------------------------
+=>REDÝS CLÝ ÜZERÝNDEN PÝNGTE BULUNABÝLÝRÝZ. (redis cli: redis iþlemlerinde yardýmcý olan komut satýrý arayüzü)
+=>Redisi, container'da dockerize ederek ayaða kaldýrdýkç Konteynýr içine girip redis cli üzerinden ping atýcaz
+                container id  
+=>docker exec -it c3f83398466d redis-cli
+76c2eeb7a91f
+
+daha sonra => ping yazýp pung sonucunu alýrsam redis sunucusu düzgün þekilde ayaktadýr.
+           => ping merhaba yazýp merhaba sonucunu alýrsan da baþarýlý demektir.
+
+
+
+
+
+
+Bizim redis sunucumuz nerede?
++Dockerize edilmiþ halde bir containerda ve bunu 6379 portundan localhosttaki 1453 portuna baðlamýþtýk.
+
+Redis-Insigt;
+	Key=Veriler
+
+-----------------------------------------------------REDIS VERÝ TÜRLERÝ----------------------------------------------------------------------------------------------------
+
+*herhangi bir veri türüne dair talimati redis cli veya powershell üzerinden verebilirsin.
+*REDIS, Veri türü açýsýndan oldukça zengin bir 'veritabanýdýr'
+	
+	*string : metinsel ifadeler, binary olarak resim, dosya vb saklayabiliriz
+	*List   : Deðerleri koleksiyonel olarak tutan tür
+	*Set	  : Verileri 'rastgele' düzende unique biçimde tutan veri türü
+	*Sorted Set: Set'in düzenli bi þekilde veri tutan versiyonudur.
+	*Hash   : Key-Value formatýnda veri tutan tür
+	*Streams: Log gibi hareket eden bir veri türü, Streams, event'lerin oluþtuklarý sýrayla kaydedilmesini ve daha sonra iþlenmesini saðlar.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+                                               (key)
+string veri türünde rediste veri eklemek: *set NAME elen
+string veri türünü rediste okumak       : *get NAME
+string'in belli bir aralýðýný okumak    : *getrange NAME 1 2
+          üzerine ekleme                : *append NAME ezgi
+
+Ardýþýk artým-azaltým yapmak için;
+INCR & INCRBY=> Arttýrma		INCSR SAYÝ(integer) 1
+DECR & DECRBY=> Azaltma             DECRY SAYÝ(integer) 2
+
+
+Yukarýdaki iþlemleri pratik yapmak için;
+*powershelde -------- docker exec -it c3f83398466d redis-cli --raw  ------ talimatý ile redis cli'ya baðlanýyorum
+*Container id: ------ docker -ps ------- komutu ile ayakta olan container'larýn idlerini görebilirsin 
+*Artýk string fonksiyonlarýný powershelde kullanabiliriz
+
+=>SET name Elen komutu ile rediste oluþturduðum name key'ine powershell'den elen value'sunu verdim.
+=>GET name diyerek elen deðiþkenini powershelde okuyabilirim.
+
+NOT: Rediste sayýsal veriler 'string' olarak tutulur.
+NOT: Redis "BÜYÜK-KÜÇÜK HARF DUYARLIDIR". Ne yazarsan onu algýlar.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Redis List:
+*LPUSH: Baþa veri ekleme => LPUSH NAME deneme dnm
+lpush names ayþe fatma yapýnca 0. indexe fatmayý getiriyor. Bu kodun üstüne lpush names deneme yazarsan; 0. index' deneme geçer.
+
+*LRANGE: Belli bir aralýðý listeleme=> LRANGE names 0-3
+LRANGE names 0 1 =>dersem deneme ve fatma yý getirir. Yani 0. ve 1. indexteki elemaný getirdi.
+LRANGE names 0 -1=> dersen ilk indexten son index'e kadar listeler.
+
+*RPUSH names rýfký=>sona deðer ekleme
+
+NOT: TÜRKÇE DÝL DESTEÐÝ OLMASI ÝÇÝN; cli'ye baðlanýrken _____ docker exec -it c3f83398466d redis-cli --raw _________ komutunun sonuna -raw yazmalýsýn.
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ASP.NET CORE- IN-MEMORY CACHE ÝÞLEMÝ SIRALAMA:
+1-) AddMemoryCache servisini uygulamaya ekle
+	program.cs=> builder.Services.AddMemoryCache();
+
+2-) InMemoryCache referansýný inject et
+3-) Set metoduyla veriyi cache'leyebilr, Get metoduyla cache'lenmiþ veriyi elde edebilirsin
+4-) Remove fonks. ile cache'lenmiþ verileri silebilirsin.
+5-) TryGetValue metodu ile kontrollü bir þekilde cache'den veriyi okuyabilirsin.
+
+

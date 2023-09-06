@@ -1,0 +1,4 @@
+RedisJon paketini redise eklemek için;
+  docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest =>  image'i kullanarak  Redis Stack sunucusunu baþlatma
+  docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest => image'i kullanarak redis stack container'da baþlatma
+  docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest =>sunucuya baðlanma

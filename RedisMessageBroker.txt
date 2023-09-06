@@ -1,0 +1,148 @@
+
+-----------------------------------REDIS CLİ PUB-SUB----------------------------------------------------------------
+Redisin cachleme ve veritabanı özelliği dışında 'Message Broker' özelliği de vardır.
+
+Redis Cli: Redis cli üzerinden pub/sub işlemleri yapabiliriz.
+
+StackExcahnge.Redis kütüphanesini kullanıcaz.
+
+Redis Insight yüzünden pub/sub işlemleri gerçekleştirilebilir.
+
+
+REDIS CLI Üzerinde Kod yazmadan PUB/SUB İŞLEMLERİ
+1. powershellden iki pencere aç
+
+2. ikisinden de redis cli'ya bağlan=> docker exec -it d5b1b1f183b8 --raw her iki client'ta redis cliya bağlanmış oldum.
+
+3. Biri publisher, biri ise consumer (subscriber) olacak.
+Öncelikle consumer(tüketici) görevi görecek olana 'subscribe ...channel...' komutunu vererek gelecek olan tüm mesajlara abone oluruz.
+Ardından hangi kanalı takip edecekse o kanalın ismini veriyoruz.
+
+subscribe my channel
+
+4. publisher olacak pencereye 'publish mychannel merhaba' yazarız. =>mychannel isimli kanala merhaba mesajı yazdırırız.
+
+
+BUNU NİYE TERCİH EDERİZ?
+Redis sunucusundaki herhangi bir kanaldaki mesajları hızlıca takip etmek istiyorsak kod yazmadan redis cli üzerinden yapabiliriz.
+Test süreçlerini hızlıca takip edebiliriz.
+--------------------------------------------------------------------------------------------------------------------------
+
+
+--------------------------------REDIS INSIGHT İLE PUB/SUB-----------------------------------------------------------------
+
+Redis insight'ı aç => en soldaki en alta tıkla
+kanal ismini yazıp mesajını yaz. Mychannel da yazarsan az önceki powersheldede insight üzerinden yazdığın mesajlar gözükecektir.
+
+İnsightta subscribe ol
+Powershelden göndereceğin mesajı insightaa göstermek istiyorsan da aynı şekilde ---- publish mychannel 'merhaba millet'
+
+Böylece kanal takibi insight üzerinden de yapabilirsin
+---------------------------------------------------------------------------------------------------------------------------
+
+
+-----------------------------REDIS API İLE PUB/SUB İŞLEMLERİ-------------------------------------------------------------
+1.Redis api üzerinden PUB/SUB İŞLEMİNİ  gerçekleştirebilmek için stackexchange.redis kütüphanesini indiririz.
+2. ConnectionMultiplexer sınıfı üzerinden Redis sunucusuna bir bağlantı oluştururuz.
+     ConnectionMultiplexer redis= await ConnectionMultiplexer.ConnectAsync("localhost:1453");
+
+3. Devamında ise bu bağlantı üzerinden bir subscriber oluştururuz.
+     ISubscriber subscriber=redis.GetSubscriber();
+
+4. Artık davranışlarımız publisher ve consumer olmak üzere ikiye ayrılacaktır.
+
+5.
+ Publisher classında;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+using StackExchange.Redis;
+
+ConnectionMultiplexer connection = await ConnectionMultiplexer.ConnectAsync("localhost:1453");
+
+ISubscriber subscriber = connection.GetSubscriber();
+
+while (true)
+{
+    Console.Write("Mesaj : ");
+    string message = Console.ReadLine();
+    await subscriber.PublishAsync("mychannel", "canım sıkılıyor..");
+}
+-------------------------------------------------------------------------------------
+
+Consumer classında;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+using StackExchange.Redis;
+
+ConnectionMultiplexer connection = await ConnectionMultiplexer.ConnectAsync("localhost:1453");
+ISubscriber subscriber = connection.GetSubscriber();
+
+subscriber.SubscribeAsync("mychannel", (channel, message) =>
+{
+    Console.WriteLine(message);
+});
+Console.Read();
+
+-----------------------------------------------------------------------------------------
+
+
+Publisher'ı ideden ayağa kaldırıcaz. 
+Consumer'ı powershelden;
+	1.Powershel aç
+	2. cd C:\Users\elen.kocak\source\CacheSystem\Redis.Pub.Sub.Subscriber   yap ve consumerının dizinine gel
+	3. cls
+	4. dotnet run
+
+Publisherı çalıştırıp mesajını yazdığında, artık consumerların üzerinde bu mesajları görebilirsin.
+--------------------------------------------------------------------------------------------------------------------
+
+
+
+-------------------------------REDIS PATTERN-MATCHING SUBSCRİPTİON - ABONELİK DEĞİŞTİRME----------------------------
+Redis, Pattern-Matching-Subscription modeli sayesinde abonelerin belirli kalıplarda(pattern) ya da desenlerde mesajlar almasını sağlayabilmektedir.
+
+Bu abonelerin birden fazla farklı pattern'lara sahip olan kanaldan mesajlar almasını veya
+belirli bir kalıba uyan kanalları filtrelemesini mümkün kılar.
+
+Örn: bir abonenin sadece 'stock.*' pattern'ına uygun olan kanallardan mesaj almasını istersen; 'stock.apple', 'stock.google', 'stock.amazon' gibi kanallardan
+mesaj alabilir ancak 'news.tech' isimli kanaldan alamaz doğal olarak bu kanalın mesajlarını filtrelemiş oluruz.
+
+
+*Pattern-matching subscription'u uygulayabilmek için yapmamız gerkeen sdc aşağıdaki gibi channel adını belirtmektir.
+//await subscriber.SubscribeAsync("stock.*", (channel, message) =>
+//{
+//Console.WriteLine("message");
+//});
+
+Ancak böyle yapacaksam consumerda subscribe olurken en başta bunu belirtmeliyim
+*docker exec -it  09090 redis-cli --raw
+*psubscribe mychannel.*        =>pattern' ı bildirdik bu mychannel'a gelen her şeyi tüketir.
+
+*psubscribe mychannel.x        => olursa nettir  mychannel.x olanı görür
+
+PUBLISHER'DA=> publish mychannel.* merhaba dersen pattern alan consumerında bu gözükecek
+PUBLISHER'DA=> publish mychannel yazarsan consumerda gözükmez çünkü pattern belirttik.
+---------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,2 @@
+Redise baðlanmak için => StackExchange.Redis kütüphanesini indiricem
+örnek rastgele veriler oluþturmak için Faker.Net kütüphanesini indiricem.
